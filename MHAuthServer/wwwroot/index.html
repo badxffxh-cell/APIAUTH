@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel MH Auth</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Segoe UI, sans-serif; }
+        body { background: #0d0e12; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .card { background: #16181e; border: 1px solid #1f222c; padding: 30px; border-radius: 10px; width: 400px; }
+        h2 { color: #0078d4; text-align: center; margin-bottom: 20px; }
+        .info { background: #0d0e12; border-left: 4px solid #0078d4; padding: 10px; margin-bottom: 20px; font-family: monospace; }
+        button { width: 100%; padding: 12px; background: #0078d4; color: #fff; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        button:hover { background: #005a9e; }
+        .key { margin-top: 15px; padding: 10px; border: 1px dashed #0078d4; color: #0078d4; text-align: center; font-weight: bold; display: none; word-break: break-all; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div id="login">
+        <h2>MH Auth</h2>
+        <p style="color: #888; text-align: center; margin-bottom: 20px;">Faça login via Google para acessar seu painel.</p>
+        <button onclick="loginDev()" style="margin-bottom:15px;">Entrar como Desenvolvedor</button>
+        <div class="g_id_signin" data-type="standard" data-theme="dark"></div>
+    </div>
+    <div id="dash" style="display:none;">
+        <h2>MH Auth Dashboard</h2>
+        <div class="info">
+            <p>OwnerID: <span id="oid"></span></p>
+            <p>Secret: <span id="sec"></span></p>
+        </div>
+        <button onclick="gerar()">Gerar Key</button>
+        <div id="res" class="key"></div>
+    </div>
+</div>
+<script>
+    let o="", s=""; async function loginDev() { let res = await fetch('/api/auth/google-login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ZX1haWw9ZGV2QG1oYXV0aC5jb20.signature'}) }); let d = await res.json(); if(d.success) { o = d.ownerId; s = d.secret; document.getElementById('oid').innerText = o; document.getElementById('sec').innerText = s; document.getElementById('login').style.display = 'none'; document.getElementById('dash').style.display = 'block'; } }
+    async function onLogin(r) {
+        let res = await fetch('/api/auth/google-login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({token: r.credential}) });
+        let d = await res.json();
+        if(d.success) {
+            o = d.ownerId; s = d.secret;
+            document.getElementById('oid').innerText = o;
+            document.getElementById('sec').innerText = s;
+            document.getElementById('login').style.display = 'none';
+            document.getElementById('dash').style.display = 'block';
+        }
+    }
+    async function gerar() {
+        let res = await fetch('/api/auth/keys/create', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ownerId: o, secret: s}) });
+        let d = await res.json();
+        if(d.success) {
+            let el = document.getElementById('res');
+            el.innerText = d.key; el.style.display = 'block';
+        }
+    }
+</script>
+</body>
+</html>
+
+
