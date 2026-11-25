@@ -1,0 +1,90 @@
+name: DevDuo · iOS IPA (sem assinatura)
+
+# Compila o app DevDuo em modo Release num Mac do GitHub e gera um .ipa
+# sem assinatura. Instale no iPhone re-assinando com Sideloadly/AltStore
+# (Apple ID grátis) ou use o EAS Build (eas.json) para um IPA assinado.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['claude/zen-clarke-fvomp8']
+    paths:
+      - 'DevDuo/**'
+      - '.github/workflows/devduo-ios-ipa.yml'
+
+concurrency:
+  group: devduo-ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ipa:
+    runs-on: macos-26
+    timeout-minutes: 120
+    defaults:
+      run:
+        working-directory: DevDuo
+    env:
+      CI: 1
+      EXPO_NO_TELEMETRY: 1
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: DevDuo/package-lock.json
+
+      - name: Selecionar Xcode 26.x mais recente
+        run: |
+          ls -d /Applications/Xcode*.app || true
+          XCODE=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | grep -v -i beta | sort -V | tail -1)
+          if [ -n "$XCODE" ]; then sudo xcode-select -s "$XCODE"; fi
+          xcodebuild -version
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Gerar projeto nativo (expo prebuild)
+        run: npx expo prebuild --platform ios --no-install
+
+      - name: CocoaPods
+        run: cd ios && pod install
+
+      - name: Compilar (Release, sem assinatura)
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -workspace ios/DevDuo.xcworkspace \
+            -scheme DevDuo \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/DevDuo.xcarchive" \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            archive > "$RUNNER_TEMP/xcodebuild.log" 2>&1 || { tail -n 250 "$RUNNER_TEMP/xcodebuild.log"; exit 1; }
+          tail -n 30 "$RUNNER_TEMP/xcodebuild.log"
+
+      - name: Empacotar .ipa
+        run: |
+          APP="$RUNNER_TEMP/DevDuo.xcarchive/Products/Applications/DevDuo.app"
+          test -d "$APP"
+          mkdir -p "$RUNNER_TEMP/ipa/Payload"
+          cp -R "$APP" "$RUNNER_TEMP/ipa/Payload/"
+          cd "$RUNNER_TEMP/ipa" && zip -qry DevDuo-unsigned.ipa Payload
+          ls -lh "$RUNNER_TEMP/ipa/DevDuo-unsigned.ipa"
+
+      - name: Publicar artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: DevDuo-unsigned-ipa
+          path: ${{ runner.temp }}/ipa/DevDuo-unsigned.ipa
+          retention-days: 30
+
+      - name: Log do Xcode (em caso de falha)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcodebuild-log
+          path: ${{ runner.temp }}/xcodebuild.log
+          if-no-files-found: ignore
