@@ -77,7 +77,7 @@ export function WeeklyChart({ values, labels, goal, height = 150 }: Props) {
     <View>
       <View style={{ height }} onLayout={(e) => setW(e.nativeEvent.layout.width)}>
         {w > 0 && (
-          <Canvas style={StyleSheet.absoluteFill}>
+          <Canvas style={FILL}>
             {goalY !== null && (
               <Line p1={vec(SIDE, goalY)} p2={vec(w - SIDE, goalY)} color="rgba(0,255,148,0.35)" strokeWidth={1}>
                 <DashPathEffect intervals={[4, 6]} />
@@ -122,3 +122,5 @@ export function WeeklyChart({ values, labels, goal, height = 150 }: Props) {
 const styles = StyleSheet.create({
   labels: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: SIDE - 16 + 2, marginTop: 6 },
 });
+
+const FILL = { position: 'absolute', left: 0, top: 0, right: 0, bottom: 0 } as const;

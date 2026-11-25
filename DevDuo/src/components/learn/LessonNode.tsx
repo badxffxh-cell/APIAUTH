@@ -33,7 +33,7 @@ export function LessonNode({ icon, state, title, color, size = 78, onPress }: Pr
   const iconColor = state === 'locked' ? colors.textTertiary : state === 'done' ? colors.textInverse : '#fff';
 
   return (
-    <View style={{ alignItems: 'center', width: 150 }}>
+    <PressableScale onPress={onPress} scaleTo={0.92} hapticStyle={state === 'locked' ? 'none' : 'medium'} style={{ alignItems: 'center', width: 150 }}>
       {state === 'current' && (
         <Animated.View style={[styles.bubble, bubble]}>
           <LinearGradient colors={gradients.primary} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.bubbleInner}>
@@ -42,8 +42,7 @@ export function LessonNode({ icon, state, title, color, size = 78, onPress }: Pr
           <View style={styles.bubbleTip} />
         </Animated.View>
       )}
-      <PressableScale onPress={onPress} scaleTo={0.9} hapticStyle={state === 'locked' ? 'none' : 'medium'}>
-        <View style={{ width: size, height: size }}>
+      <View style={{ width: size, height: size }}>
           {state !== 'locked' && <Glow color={state === 'done' ? colors.success : color} width={size} height={size} circle blur={16} opacity={state === 'current' ? 0.85 : 0.4} pulse={state === 'current'} />}
           {/* Base "3D" do botão */}
           <View style={[styles.base, { width: size, height: size, borderRadius: size / 2, backgroundColor: state === 'locked' ? 'rgba(255,255,255,0.05)' : state === 'done' ? '#00A866' : '#3B32B8' }]} />
@@ -52,12 +51,11 @@ export function LessonNode({ icon, state, title, color, size = 78, onPress }: Pr
             <Ionicons name={(state === 'locked' ? 'lock-closed' : state === 'done' ? 'checkmark-sharp' : icon) as never} size={size * 0.4} color={iconColor} />
           </LinearGradient>
           {state === 'locked' && <View pointerEvents="none" style={[styles.lockedBorder, { borderRadius: size / 2, width: size, height: size - 6 }]} />}
-        </View>
-      </PressableScale>
+      </View>
       <Txt variant="micro" center numberOfLines={2} style={[styles.title, state === 'locked' && { color: colors.textTertiary }, state === 'current' && { color: colors.text }]}>
         {title}
       </Txt>
-    </View>
+    </PressableScale>
   );
 }
 

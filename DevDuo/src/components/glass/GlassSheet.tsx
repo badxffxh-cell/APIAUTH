@@ -189,5 +189,5 @@ const styles = StyleSheet.create({
   header: { marginTop: 14, gap: 2 },
   action: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, height: 52 },
   inputWrap: { paddingHorizontal: 14, height: 52, justifyContent: 'center' },
-  input: { color: colors.text, fontFamily: fonts.medium, fontSize: 16 },
+  input: { position: 'relative', color: colors.text, fontFamily: fonts.medium, fontSize: 16 },
 });

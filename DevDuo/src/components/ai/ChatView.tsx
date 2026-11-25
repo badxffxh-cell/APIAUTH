@@ -68,7 +68,7 @@ export function ChatView({ bottomPadding = 12, compactHeader }: { bottomPadding?
         ref={scrollRef}
         style={{ flex: 1 }}
         contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 24 }}
-        onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: true })}
+        onContentSizeChange={() => messages.length > 0 && scrollRef.current?.scrollToEnd({ animated: true })}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="interactive"
       >
@@ -208,7 +208,7 @@ function Bubble({ msg, streaming }: { msg: ChatMessage; streaming: boolean }) {
 const styles = StyleSheet.create({
   contextRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   inputBar: { flexDirection: 'row', alignItems: 'flex-end', paddingLeft: 16, paddingRight: 6, paddingVertical: 6, minHeight: 52 },
-  input: { flex: 1, color: colors.text, fontFamily: fonts.regular, fontSize: 15.5, maxHeight: 120, paddingTop: 9, paddingBottom: 9 },
+  input: { position: 'relative', flex: 1, color: colors.text, fontFamily: fonts.regular, fontSize: 15.5, maxHeight: 120, paddingTop: 9, paddingBottom: 9 },
   send: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   starter: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 14, height: 50 },
   userBubble: { maxWidth: '85%', paddingHorizontal: 14, paddingVertical: 10, borderRadius: 20, borderBottomRightRadius: 6 },

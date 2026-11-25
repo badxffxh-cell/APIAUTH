@@ -101,7 +101,7 @@ export default function SettingsScreen() {
               />
             </GlassView>
             <View style={{ flexDirection: 'row', gap: 10 }}>
-              <GradientButton title="Salvar chave" size="md" icon="key" disabled={!keyInput.trim()} onPress={saveKey} style={{ flex: 1 }} />
+              <GradientButton title="Salvar" size="md" icon="key" disabled={!keyInput.trim()} onPress={saveKey} style={{ flex: 1 }} />
               <GradientButton title="Testar" size="md" variant="glass" icon="pulse" loading={testing} onPress={test} style={{ flex: 1 }} />
             </View>
             {testResult && (
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
   card: { padding: 16, gap: 12 },
   rowBetween: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
   inputWrap: { paddingHorizontal: 14, height: 48, justifyContent: 'center' },
-  input: { color: colors.text, fontFamily: fonts.medium, fontSize: 15 },
+  input: { position: 'relative', color: colors.text, fontFamily: fonts.medium, fontSize: 15 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   link: { flexDirection: 'row', alignItems: 'center', gap: 6 },
 });

@@ -30,15 +30,22 @@ interface Props {
   loopEvery?: number;
   burstKey?: string | number;
   paused?: boolean;
+  /** Altura de origem da explosão, em fração da metade da tela (0 = centro, 1 = topo). */
+  originY?: number;
 }
 
 /** Explosão de partículas 3D com gravidade, brilho aditivo e onda de choque. */
-export function ParticleBurst({ style, colors = ['#6C63FF', '#00E5FF', '#00FF94', '#FFD166', '#FFFFFF'], loopEvery = 3.4, burstKey, paused }: Props) {
+export function ParticleBurst({ style, colors = ['#6C63FF', '#00E5FF', '#00FF94', '#FFD166', '#FFFFFF'], loopEvery = 3.4, burstKey, paused, originY = 0.2 }: Props) {
   const setup = useCallback(
     ({ width, height }: SceneContext): SceneHandle => {
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(55, width / height, 0.1, 100);
       camera.position.set(0, 0, 8);
+      const visH = 2 * 8 * Math.tan((27.5 * Math.PI) / 180);
+      const visW = visH * (width / height);
+      const oy = (visH / 2) * originY;
+      // Velocidade proporcional à largura visível: a explosão cabe na tela em retrato.
+      const spread = visW * 0.9;
 
       const pos = new Float32Array(N * 3);
       const vel = new Float32Array(N * 3);
@@ -56,17 +63,18 @@ export function ParticleBurst({ style, colors = ['#6C63FF', '#00E5FF', '#00FF94'
       geo.setAttribute('aSize', new THREE.BufferAttribute(size, 1));
       geo.setAttribute('aLife', aLife);
 
-      const uniforms = { uSize: { value: 34 * PixelRatio.get() } };
+      const uniforms = { uSize: { value: 46 * PixelRatio.get() } };
       const mat = glowPointsMaterial(uniforms, VERT);
       const points = new THREE.Points(geo, mat);
       points.frustumCulled = false;
       scene.add(points);
 
       const ringMat = new THREE.MeshBasicMaterial({ color: '#00E5FF', transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false });
-      const ring = new THREE.Mesh(new THREE.RingGeometry(0.92, 1, 96), ringMat);
+      const ring = new THREE.Mesh(new THREE.RingGeometry(0.9, 1, 96), ringMat);
+      ring.position.y = oy;
       scene.add(ring);
       const flash = new THREE.Mesh(new THREE.PlaneGeometry(6, 6), radialGlowMaterial('#6C63FF', 0));
-      flash.position.z = -0.5;
+      flash.position.set(0, oy, -0.5);
       scene.add(flash);
       const flashMat = flash.material as THREE.ShaderMaterial;
 
@@ -75,19 +83,17 @@ export function ParticleBurst({ style, colors = ['#6C63FF', '#00E5FF', '#00FF94'
           const u = Math.random() * 2 - 1;
           const th = Math.random() * Math.PI * 2;
           const s = Math.sqrt(1 - u * u);
-          const speed = 2.5 + Math.random() * 6.5;
-          pos.set([0, 0.2, 0], i * 3);
-          vel.set([s * Math.cos(th) * speed, u * speed * 0.9 + 2.2, s * Math.sin(th) * speed * 0.6], i * 3);
+          const speed = spread * (0.35 + Math.random() * 0.95);
+          pos.set([0, oy, 0], i * 3);
+          vel.set([s * Math.cos(th) * speed, u * speed * 1.1 + spread * 0.55, s * Math.sin(th) * speed * 0.6], i * 3);
           const c = palette[Math.floor(Math.random() * palette.length)];
           col.set([c.r, c.g, c.b], i * 3);
           size[i] = 0.4 + Math.random() * 1.4;
           life[i] = 1;
-          decay[i] = 0.35 + Math.random() * 0.45;
+          decay[i] = 0.28 + Math.random() * 0.32;
         }
         (geo.getAttribute('aColor') as THREE.BufferAttribute).needsUpdate = true;
         (geo.getAttribute('aSize') as THREE.BufferAttribute).needsUpdate = true;
-        ring.scale.setScalar(0.1);
-        ringMat.opacity = 0.9;
         flashMat.uniforms.uStrength.value = 1.1;
       };
       fire();
@@ -101,12 +107,14 @@ export function ParticleBurst({ style, colors = ['#6C63FF', '#00E5FF', '#00FF94'
             lastFire = t;
             fire();
           }
+          const age = t - lastFire;
           for (let i = 0; i < N; i++) {
             if (life[i] <= 0) continue;
             const k = i * 3;
-            vel[k] *= 0.985;
-            vel[k + 1] = vel[k + 1] * 0.985 - 4.2 * dt;
-            vel[k + 2] *= 0.985;
+            const drag = Math.pow(0.35, dt);
+            vel[k] *= drag;
+            vel[k + 1] = vel[k + 1] * drag - spread * 0.9 * dt;
+            vel[k + 2] *= drag;
             pos[k] += vel[k] * dt;
             pos[k + 1] += vel[k + 1] * dt;
             pos[k + 2] += vel[k + 2] * dt;
@@ -114,8 +122,8 @@ export function ParticleBurst({ style, colors = ['#6C63FF', '#00E5FF', '#00FF94'
           }
           aPos.needsUpdate = true;
           aLife.needsUpdate = true;
-          ring.scale.multiplyScalar(1 + dt * 3.2);
-          ringMat.opacity = Math.max(0, ringMat.opacity - dt * 0.9);
+          ring.scale.setScalar(0.15 + age * spread * 0.9);
+          ringMat.opacity = Math.max(0, 0.85 - age * 1.2);
           flashMat.uniforms.uStrength.value = Math.max(0, flashMat.uniforms.uStrength.value - dt * 1.4);
           points.rotation.y = Math.sin(t * 0.4) * 0.3;
         },

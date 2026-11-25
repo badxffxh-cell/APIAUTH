@@ -32,7 +32,7 @@ export function AmbientOrbs({ palette = DEFAULT, intensity = 1 }: Props) {
 
   return (
     <View pointerEvents="none" style={[StyleSheet.absoluteFill, { opacity: intensity }]}>
-      <Canvas style={StyleSheet.absoluteFill}>
+      <Canvas style={FILL}>
         <Circle c={c1} r={r1}>
           <RadialGradient c={c1} r={r1} colors={[palette[0], 'rgba(8,8,16,0)']} />
         </Circle>
@@ -46,3 +46,5 @@ export function AmbientOrbs({ palette = DEFAULT, intensity = 1 }: Props) {
     </View>
   );
 }
+
+const FILL = { position: 'absolute', left: 0, top: 0, right: 0, bottom: 0 } as const;

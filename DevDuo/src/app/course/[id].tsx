@@ -65,7 +65,7 @@ export default function CourseScreen() {
       if (!group.length) continue;
       unit++;
       items.push({ kind: 'banner', level, y, unit });
-      y += BANNER + 28;
+      y += BANNER + 56;
       for (const lesson of group) {
         items.push({ kind: 'node', lesson, index: n, x: width / 2 + OFFSETS[n % OFFSETS.length], y });
         y += NODE_ROW;

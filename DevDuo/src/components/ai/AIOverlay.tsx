@@ -46,7 +46,8 @@ function FloatingButton({ onPress }: { onPress: () => void }) {
   const minY = insets.top + 70;
   const maxY = height - insets.bottom - 110 - FAB;
   const x = useSharedValue(width - FAB - margin);
-  const y = useSharedValue(height - insets.bottom - 200);
+  // Começa logo acima da tab bar, no canto direito (arrastável).
+  const y = useSharedValue(height - Math.max(insets.bottom, 12) - 68 - FAB - 18);
   const startX = useSharedValue(0);
   const startY = useSharedValue(0);
   const pressed = useSharedValue(1);
@@ -198,7 +199,7 @@ function ChatPanel({ open, onClose }: { open: boolean; onClose: () => void }) {
 }
 
 const styles = StyleSheet.create({
-  fab: { position: 'absolute', left: 0, top: 0, width: FAB, height: FAB, shadowColor: '#6C63FF', shadowOpacity: 0.7, shadowRadius: 18, shadowOffset: { width: 0, height: 6 } },
+  fab: { position: 'absolute', left: 0, top: 0, width: FAB, height: FAB, borderRadius: FAB / 2, shadowColor: '#6C63FF', shadowOpacity: 0.7, shadowRadius: 18, shadowOffset: { width: 0, height: 6 } },
   ring: { position: 'absolute', width: FAB, height: FAB, borderRadius: FAB / 2, borderWidth: 2, borderColor: colors.accent },
   fabInner: { width: FAB, height: FAB, borderRadius: FAB / 2, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)' },
   ctxDot: { position: 'absolute', top: 6, right: 6, width: 12, height: 12, borderRadius: 6, backgroundColor: colors.success, borderWidth: 2, borderColor: '#5A7BFF' },

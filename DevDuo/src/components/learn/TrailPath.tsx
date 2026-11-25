@@ -1,6 +1,5 @@
 import { BlurMask, Canvas, DashPathEffect, LinearGradient, Path, Skia, vec } from '@shopify/react-native-skia';
 import { useMemo } from 'react';
-import { StyleSheet } from 'react-native';
 
 import { colors } from '@/theme';
 
@@ -30,7 +29,7 @@ export function TrailPath({ points, width, height, doneSegments }: Props) {
   const all = useMemo(() => curve(points, 0, points.length - 1), [points]);
   const done = useMemo(() => curve(points, 0, Math.min(doneSegments, points.length - 1)), [points, doneSegments]);
   return (
-    <Canvas pointerEvents="none" style={[StyleSheet.absoluteFill, { width, height }]}>
+    <Canvas pointerEvents="none" style={{ position: 'absolute', left: 0, top: 0, width, height }}>
       <Path path={all} style="stroke" strokeWidth={5} strokeCap="round" color="rgba(255,255,255,0.13)">
         <DashPathEffect intervals={[2, 14]} />
       </Path>

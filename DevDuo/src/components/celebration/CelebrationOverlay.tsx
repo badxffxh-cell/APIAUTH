@@ -32,7 +32,7 @@ export function CelebrationOverlay() {
         <BlurView intensity={30} tint="dark" style={StyleSheet.absoluteFill} />
         <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(5,5,12,0.72)' }]} />
       </Pressable>
-      <ParticleBurst colors={[achievement.colors[0], achievement.colors[1], '#FFFFFF', colors.accent]} burstKey={achievement.id} loopEvery={2.6} />
+      <ParticleBurst colors={[achievement.colors[0], achievement.colors[1], '#FFFFFF', colors.accent]} burstKey={achievement.id} loopEvery={2.6} originY={0.25} />
       <View style={styles.center} pointerEvents="box-none">
         <Animated.View entering={ZoomIn.springify().damping(12).stiffness(140)}>
           <GlassView radius={32} strong style={styles.card}>

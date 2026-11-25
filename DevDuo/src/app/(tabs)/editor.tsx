@@ -202,6 +202,6 @@ const styles = StyleSheet.create({
   newCard: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16 },
   project: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 14 },
   inputWrap: { paddingHorizontal: 14, height: 52, justifyContent: 'center' },
-  input: { color: colors.text, fontFamily: fonts.medium, fontSize: 16 },
+  input: { position: 'relative', color: colors.text, fontFamily: fonts.medium, fontSize: 16 },
   template: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12 },
 });

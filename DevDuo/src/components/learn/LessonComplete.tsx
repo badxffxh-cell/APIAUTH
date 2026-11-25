@@ -50,7 +50,7 @@ export function LessonComplete({ result, durationMs, hasNext, onContinue, onNext
 
   return (
     <View style={StyleSheet.absoluteFill}>
-      <ParticleBurst loopEvery={4} />
+      <ParticleBurst loopEvery={4} originY={0.62} />
       <View style={[styles.content, { paddingTop: insets.top + 40, paddingBottom: insets.bottom + 20 }]}>
         <View style={{ alignItems: 'center' }}>
           <Animated.View entering={ZoomIn.springify().damping(10).stiffness(120)}>

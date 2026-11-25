@@ -109,7 +109,7 @@ export function GradientIcon({
   glow?: boolean;
 }) {
   return (
-    <View style={glow ? { shadowColor: c[0], shadowOpacity: 0.6, shadowRadius: 12, shadowOffset: { width: 0, height: 4 } } : undefined}>
+    <View style={[{ borderRadius: size * 0.32 }, glow ? { shadowColor: c[0], shadowOpacity: 0.6, shadowRadius: 12, shadowOffset: { width: 0, height: 4 } } : null]}>
       <LinearGradient colors={c} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ width: size, height: size, borderRadius: size * 0.32, alignItems: 'center', justifyContent: 'center' }}>
         <LinearGradient
           colors={['rgba(255,255,255,0.4)', 'rgba(255,255,255,0)']}
